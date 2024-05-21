@@ -42,7 +42,7 @@ config.inactive_pane_hsb = {
 }
 
 -- Keys
-config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
+config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 3000 }
 config.keys = {
   -- Send C-a when pressing C-a twice
   { key = "a",          mods = "LEADER|CTRL", action = act.SendKey { key = "a", mods = "CTRL" } },
