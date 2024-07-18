@@ -1,45 +1,110 @@
---- wezterm.lua
---- $ figlet -f small Wezterm
---- __      __      _
---- \ \    / /__ __| |_ ___ _ _ _ __
----  \ \/\/ / -_)_ /  _/ -_) '_| '  \
----   \_/\_/\___/__|\__\___|_| |_|_|_|
----
---- My Wezterm config file
-
-local wezterm = require("wezterm")
+local wezterm = require 'wezterm'
 local act = wezterm.action
 
--- local fish_path = "/opt/homebrew/bin/fish"
-
-local config = {}
--- Use config builder object if possible
-if wezterm.config_builder then config = wezterm.config_builder() end
+local config = wezterm.config_builder()
+config:set_strict_mode(true)
 
 wezterm.on("gui-startup", function(cmd)
   local _, _, window = wezterm.mux.spawn_window(cmd or {})
   window:gui_window():maximize()
 end)
 
--- Settings
--- config.default_prog = { fish_path, "-l" }
+config.font = wezterm.font 'Hack'
+config.font_size = 14
+config.color_scheme = 'Catppuccin Mocha (Gogh)'
 
-config.color_scheme = "Tokyo Night"
-config.font = wezterm.font_with_fallback({
-  { family = "JetBrains Mono", scale = 1.3, weight = "Medium", },
-  { family = "FantasqueSansM Nerd Font", scale = 1.3, },
-})
-config.window_background_opacity = 0.9
-config.window_decorations = "RESIZE"
-config.window_close_confirmation = "AlwaysPrompt"
-config.scrollback_lines = 3000
-config.default_workspace = "main"
-
--- Dim inactive panes
-config.inactive_pane_hsb = {
-  saturation = 0.24,
-  brightness = 0.5
+local TITLEBAR_COLOR = '#333333'
+config.native_macos_fullscreen_mode = true
+config.window_decorations = 'INTEGRATED_BUTTONS|RESIZE'
+config.window_frame = {
+  font = wezterm.font { family = 'Hack', weight = 'Bold' },
+  font_size = 13.0,
+  active_titlebar_bg = TITLEBAR_COLOR,
+  inactive_titlebar_bg = TITLEBAR_COLOR,
 }
+
+-- Switch between just an opacity and a background image based on whether we are fullscreen
+function set_background(config, is_fullscreen)
+  if is_fullscreen then
+    config.window_background_opacity = nil
+    config.background = {
+      {
+        source = {
+          File = 'home/krishna/.config/leo.jpg',
+        },
+        attachment = { Parallax = 0.1 },
+        repeat_y = 'Mirror',
+        horizontal_align = 'Center',
+        opacity = 0.4,
+        hsb = {
+          hue = 1.0,
+          saturation = 0.95,
+          brightness = 0.5,
+        },
+      },
+    }
+  else
+    config.window_background_opacity = 0.85
+    config.background = nil
+  end
+end
+
+wezterm.on('window-resized', function(window, pane)
+  local overrides = window:get_config_overrides() or {}
+  local is_fullscreen = window:get_dimensions().is_full_screen
+  set_background(overrides, is_fullscreen)
+  window:set_config_overrides(overrides)
+end)
+
+wezterm.on('update-status', function(window, pane)
+  local cells = {}
+
+  -- Figure out the hostname of the pane on a best-effort basis
+  local hostname = wezterm.hostname()
+  local cwd_uri = pane:get_current_working_dir()
+  if cwd_uri and cwd_uri.host then
+    hostname = cwd_uri.host
+  end
+  table.insert(cells, ' ' .. hostname)
+
+  -- Format date/time in this style: "Wed Mar 3 08:14"
+  local date = wezterm.strftime ' %a %b %-d %H:%M'
+  table.insert(cells, date)
+
+  -- Add an entry for each battery (typically 0 or 1)
+  local batt_icons = {'', '', '', '', ''}
+  for _, b in ipairs(wezterm.battery_info()) do
+    local curr_batt_icon = batt_icons[math.ceil(b.state_of_charge * #batt_icons)]
+    table.insert(cells, string.format('%s %.0f%%', curr_batt_icon, b.state_of_charge * 100))
+  end
+
+  -- Color palette for each cell
+  local text_fg = '#c0c0c0'
+  local colors = {
+    TITLEBAR_COLOR,
+    '#3c1361',
+    '#52307c',
+    '#663a82',
+    '#7c5295',
+    '#b491c8',
+  }
+
+  local elements = {}
+  while #cells > 0 and #colors > 1 do
+    local text = table.remove(cells, 1)
+    local prev_color = table.remove(colors, 1)
+    local curr_color = colors[1]
+
+    table.insert(elements, { Background = { Color = prev_color } })
+    table.insert(elements, { Foreground = { Color = curr_color } })
+    table.insert(elements, { Text = '' })
+    table.insert(elements, { Background = { Color = curr_color } })
+    table.insert(elements, { Foreground = { Color = text_fg } })
+    table.insert(elements, { Text = ' ' .. text .. ' ' })
+  end
+  window:set_right_status(wezterm.format(elements))
+end)
+
 
 -- Keys
 config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 3000 }
@@ -121,86 +186,5 @@ config.key_tables = {
     { key = "Enter",  action = "PopKeyTable" },
   }
 }
-
--- Tab bar
--- I don't like the look of "fancy" tab bar
-config.use_fancy_tab_bar = false
-config.status_update_interval = 1000
-config.tab_bar_at_bottom = false
-wezterm.on("update-status", function(window, pane)
-  -- Workspace name
-  local stat = window:active_workspace()
-  local stat_color = "#f7768e"
-  -- It's a little silly to have workspace name all the time
-  -- Utilize this to display LDR or current key table name
-  if window:active_key_table() then
-    stat = window:active_key_table()
-    stat_color = "#7dcfff"
-  end
-  if window:leader_is_active() then
-    stat = "LDR"
-    stat_color = "#bb9af7"
-  end
-
-  local basename = function(s)
-    -- Nothing a little regex can't fix
-    return string.gsub(s, "(.*[/\\])(.*)", "%2")
-  end
-
-  -- Current working directory
-  local cwd = pane:get_current_working_dir()
-  if cwd then
-    if type(cwd) == "userdata" then
-      -- Wezterm introduced the URL object in 20240127-113634-bbcac864
-      cwd = basename(cwd.file_path)
-    else
-      -- 20230712-072601-f4abf8fd or earlier version
-      cwd = basename(cwd)
-    end
-  else
-    cwd = ""
-  end
-
-  -- Current command
-  local cmd = pane:get_foreground_process_name()
-  -- CWD and CMD could be nil (e.g. viewing log using Ctrl-Alt-l)
-  cmd = cmd and basename(cmd) or ""
-
-  -- Time
-  local time = wezterm.strftime("%H:%M")
-
-  -- Left status (left of the tab line)
-  window:set_left_status(wezterm.format({
-    { Foreground = { Color = stat_color } },
-    { Text = "  " },
-    { Text = wezterm.nerdfonts.oct_table .. "  " .. stat },
-    { Text = " |" },
-  }))
-
-  -- Right status
-  window:set_right_status(wezterm.format({
-    -- Wezterm has a built-in nerd fonts
-    -- https://wezfurlong.org/wezterm/config/lua/wezterm/nerdfonts.html
-    { Text = wezterm.nerdfonts.md_folder .. "  " .. cwd },
-    { Text = " | " },
-    { Foreground = { Color = "#e0af68" } },
-    { Text = wezterm.nerdfonts.fa_code .. "  " .. cmd },
-    "ResetAttributes",
-    { Text = " | " },
-    { Text = wezterm.nerdfonts.md_clock .. "  " .. time },
-    { Text = "  " },
-  }))
-end)
-
---[[ Appearance setting for when I need to take pretty screenshots
-config.enable_tab_bar = false
-config.window_padding = {
-  left = '0.5cell',
-  right = '0.5cell',
-  top = '0.5cell',
-  bottom = '0cell',
-
-}
---]]
 
 return config
