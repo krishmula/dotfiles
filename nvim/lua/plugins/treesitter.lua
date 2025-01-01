@@ -8,6 +8,20 @@ return {
   config = function()
     -- import nvim-treesitter plugin
     local treesitter = require("nvim-treesitter.configs")
+    local autoTag = require("nvim-ts-autotag")
+
+    autoTag.setup({
+      opts = {
+        enable_close = true, -- Auto close tags
+        enable_rename = true, -- Auto rename pairs of tags
+        enable_close_on_slash = false -- Auto close on trailing </
+      },
+      per_filetype = {
+        ["html"] = {
+          enable_close = false
+        }
+      }
+    })
 
     -- configure treesitter
     treesitter.setup({ -- enable syntax highlighting
