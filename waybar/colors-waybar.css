@@ -1,0 +1,24 @@
+/* Special colors for basic UI elements */
+@define-color foreground #FAF9F5;  /* Light off-white for main text */
+@define-color background #3A5130;  /* Deep olive green for background */
+@define-color cursor #FAF9F5;      /* Same as foreground, for cursor visibility */
+
+/* Base colors (0-7) */
+@define-color color0 #3A5130;  /* Same as background - deep olive */
+@define-color color1 #E3A19D;  /* Soft coral pink */
+@define-color color2 #E1CEAE;  /* Warm beige */
+@define-color color3 #D6DDCC;  /* Light sage green */
+@define-color color4 #F1D2CB;  /* Pale pink */
+@define-color color5 #F5E9D6;  /* Cream */
+@define-color color6 #F9F0E5;  /* Light cream */
+@define-color color7 #FAF9F5;  /* Off-white */
+
+/* Bright colors (8-15) */
+@define-color color8 #999999;  /* Mid-gray */
+@define-color color9 #E3A19D;  /* Same as color1 */
+@define-color color10 #E1CEAE; /* Same as color2 */
+@define-color color11 #D6DDCC; /* Same as color3 */
+@define-color color12 #F1D2CB; /* Same as color4 */
+@define-color color13 #F5E9D6; /* Same as color5 */
+@define-color color14 #F9F0E5; /* Same as color6 */
+@define-color color15 #F8F8F8; /* Same as color7 */
