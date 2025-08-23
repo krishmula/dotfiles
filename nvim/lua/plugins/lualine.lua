@@ -204,7 +204,7 @@ return {
 					diff,
 				},
 				lualine_y = {
-					encoding,
+					-- encoding,
 					fileformat,
 				},
 				lualine_z = {
@@ -213,7 +213,7 @@ return {
 					-- 	cond = lazy_status.has_updates,
 					-- 	color = { fg = "#ff9e64" },
 					-- },
-					dia,
+					-- dia,
 					"ex.lsp.single",
 				},
 			},
