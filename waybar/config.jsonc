@@ -18,6 +18,7 @@
     "group/control-center",
     "group/hub",
     "group/power",
-    "powermenu"
+    "powermenu",
+    "tray"
   ],
 }

@@ -153,6 +153,7 @@
     "format-disconnected": "󰖪",
     "format-linked": "󰈁",
     "tooltip": false,
+    // "on-click": "rofi -show wifi -modi 'wifi:iwdrofimenu'",
     "on-click": "pgrep -x rofi &>/dev/null && notify-send rofi || networkmanager_dmenu",
   },
   "network#speed": {
@@ -207,7 +208,7 @@
   },
   "custom/notifications": {
     "tooltip": false,
-    "format": "{icon} {}",
+    "format": "{} {icon}",
     "format-icons": {
       "notification": "󱅫",
       "none": "󰂚",
@@ -229,7 +230,7 @@
     "format": "{}",
     "tooltip": false,
     "interval": 3600,
-    "exec": "wttrbar --nerd --custom-indicator '{ICON} {temp_C}' --location hyderabad",
+    "exec": "wttrbar --nerd --custom-indicator '{ICON}{temp_C}'",
     "return-type": "json",
   },
   "custom/theme-switcher": {

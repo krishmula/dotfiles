@@ -1,14 +1,8 @@
 return {
-	"rose-pine/neovim",
-	name = "rose-pine",
+	"vague2k/vague.nvim",
 	config = function()
-		require("rose-pine").setup({
-			disable_background = true,
-			styles = {
-				-- transparency = true,
-				italic = false,
-			},
-		})
-		vim.cmd("colorscheme rose-pine-moon")
+		require("vague").setup({ transparent = false })
+		vim.cmd("colorscheme vague")
+		vim.cmd(":hi statusline guibg=NONE")
 	end,
 }

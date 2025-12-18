@@ -1,3 +1,5 @@
-background-opacity = 0
-background-blur-radius = 20
+background-opacity = 0.3
+background-blur = true
+background-blur-radius = 50
 window-decoration = false
+font-size = 15

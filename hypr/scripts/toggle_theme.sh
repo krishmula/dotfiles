@@ -28,5 +28,12 @@ else
   gtk_theme="adw-gtk3"
 fi
 
-gsettings set $GNOME_SCHEMA gtk-theme "$gtk_theme"
-gsettings set $GNOME_SCHEMA color-scheme "prefer-$new_theme_variant"
+apply_themes() {
+  gsettings set $GNOME_SCHEMA gtk-theme "Dracula"
+  gsettings set $GNOME_SCHEMA color-scheme "prefer-$new_theme_variant"
+  gsettings set $GNOME_SCHEMA icon-theme "WhiteSur-$new_theme_variant"
+  gsettings set $GNOME_SCHEMA cursor-theme "WhiteSur-cursors"
+  gsettings set $GNOME_SCHEMA font-name "Inter 11"
+}
+
+apply_themes
