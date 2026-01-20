@@ -1,6 +1,6 @@
 @import "../../.cache/wal/colors-waybar.css";
 
-@define-color main-color @color13;
+/* @define-color main-color @color13; */
 
 * {
   font: bold 16px "JetBrainsMono Nerd Font Propo";
